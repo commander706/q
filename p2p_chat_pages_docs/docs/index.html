@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>P2P Invite Chat (PeerJS)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="title">P2P Invite Chat</div>
+      <div class="sub">招待URLだけで友達と1対1チャット（WebRTC / PeerJS）</div>
+    </div>
+    <div class="status">
+      <div class="pill" id="httpPill">Checking…</div>
+      <div class="pill" id="netPill">Not connected</div>
+      <div class="pill mono" id="latPill">RTT: —</div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>1) あなたのID</h2>
+      <div class="row">
+        <input id="myId" class="mono" readonly value="(取得中…)" />
+        <button id="copyIdBtn">コピー</button>
+      </div>
+
+      <h2>2) 招待URL</h2>
+      <div class="row">
+        <input id="inviteUrl" class="mono" readonly value="(生成中…)" />
+        <button id="copyInviteBtn">コピー</button>
+      </div>
+
+      <details class="advanced">
+        <summary>詳細設定（シグナリングサーバー）</summary>
+        <p class="hint">
+          PeerJS Cloud（共有）を使うと設定不要で動きます。安定させたい場合は自分のPeerServer（Render等）を立てて、ここに入れてください。
+        </p>
+        <div class="grid2">
+          <label>Host <input id="cfgHost" placeholder="例: your-peer.onrender.com" /></label>
+          <label>Path <input id="cfgPath" placeholder="例: /" value="/" /></label>
+          <label>Port <input id="cfgPort" placeholder="例: 443" value="443" /></label>
+          <label>Secure <select id="cfgSecure"><option value="true">true</option><option value="false">false</option></select></label>
+        </div>
+        <div class="row">
+          <button id="saveCfgBtn">保存して再接続</button>
+          <button id="resetCfgBtn" class="ghost">PeerJS Cloudに戻す</button>
+        </div>
+        <p class="hint small">※ GitHub PagesなどHTTPS上で動かすなら、シグナリングも基本は secure=true / 443 を推奨。</p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>3) 接続</h2>
+      <div class="row">
+        <input id="peerId" class="mono" placeholder="相手のID（または招待URLで自動）" />
+        <button id="connectBtn">接続</button>
+      </div>
+      <div class="hint">
+        招待URL（?connect_to=...）で開いた場合は、ここが自動入力されて自動接続を試みます。
+      </div>
+
+      <div class="chatWrap">
+        <div id="chatLog" class="chatLog" aria-label="chat log"></div>
+        <div class="composer">
+          <input id="chatInput" placeholder="メッセージを入力（Enterで送信）" />
+          <button id="sendBtn">送信</button>
+        </div>
+        <div class="hint small">
+          送信メッセージにはIDを振って、相手からACKが返った時点で「到達までの時間（概算）」を表示します（RTT/2近似）。
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span class="mono">Tip:</span> 開発中はHTTP（localhost）でOK。本番はGitHub PagesなどHTTPS推奨。
+  </footer>
+
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
