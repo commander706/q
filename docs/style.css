@@ -1,0 +1,284 @@
+:root {
+  --neon-cyan: #0ff;
+  --neon-magenta: #f0f;
+  --neon-yellow: #ffea00;
+  --bg-dark: #050505;
+}
+
+body {
+  margin: 0; overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  user-select: none;
+}
+
+/* WebGL Background */
+#glCanvas {
+  position: fixed; inset: 0; z-index: -1;
+}
+
+.hidden { display: none !important; }
+
+/* Main UI Container */
+#mainContainer {
+  position: fixed; inset: 0;
+  transition: opacity 0.2s;
+}
+
+/* --- UI PANEL --- */
+#uiLayer {
+  position: fixed; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  z-index: 50;
+  pointer-events: none; /* UIパネル以外はクリック透過 */
+}
+
+.panel {
+  pointer-events: auto;
+  width: min(500px, 90vw);
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  padding: 30px;
+  backdrop-filter: blur(5px);
+  text-align: center;
+  position: relative;
+}
+
+.panelTitle {
+  font-size: 36px; font-weight: 900; letter-spacing: 4px;
+  color: #fff; text-shadow: 2px 2px 0 var(--neon-magenta);
+  font-style: italic;
+}
+.panelSub {
+  font-size: 12px; color: var(--neon-cyan); margin-bottom: 20px; letter-spacing: 2px;
+}
+
+.row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+input {
+  background: #000; border: 1px solid #444; color: var(--neon-cyan);
+  padding: 10px; font-family: monospace; outline: none; width: 100%;
+}
+input:focus { border-color: var(--neon-magenta); }
+
+/* Glitch Button */
+.glitch-btn {
+  background: transparent; border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan); padding: 10px 20px; cursor: pointer;
+  font-weight: bold; position: relative; overflow: hidden;
+  transition: 0.2s;
+}
+.glitch-btn:hover {
+  background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+/* Players List */
+.playersList {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 15px 0;
+}
+.playerChip {
+  font-size: 11px; padding: 4px 8px; border: 1px solid #555; background: #000;
+  color: #aaa;
+}
+.playerChip.me { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+
+/* Tournament Bracket */
+.bracketList { max-height: 250px; overflow-y: auto; text-align: left; margin: 15px 0; }
+.matchRow {
+  padding: 8px; background: rgba(255,255,255,0.05); margin-bottom: 4px;
+  display: flex; justify-content: space-between; font-size: 13px;
+}
+.matchRow.active { border-left: 3px solid var(--neon-magenta); background: rgba(255,0,255,0.1); }
+.winner { color: var(--neon-yellow); font-weight: bold; }
+
+/* HUD */
+#hud { position: fixed; top: 10px; left: 10px; z-index: 100; }
+.pill {
+  font-size: 10px; background: #000; border: 1px solid #333; padding: 4px 8px; color: #555;
+}
+
+/* --- GAME AREA --- */
+#gameArea {
+  position: absolute; inset: 0;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 10%; padding-bottom: 5%;
+}
+
+.charWrapper {
+  position: relative; width: 250px;
+  transition: transform 0.1s;
+}
+.charImg {
+  width: 100%; height: auto; image-rendering: pixelated;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  transition: filter 0.1s;
+}
+.left .charImg { transform: scaleX(-1); } /* 左側プレイヤーは右を向く */
+.charName {
+  position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+  background: #000; padding: 2px 6px; font-size: 12px; border: 1px solid #555;
+}
+
+/* FX Layer */
+#fxLayer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+
+/* Lightning */
+#lightning {
+  position: absolute; inset: 0; background: #fff;
+  clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+  opacity: 0; animation: flash 0.2s linear;
+}
+@keyframes flash { 0%,100% { opacity: 0;} 50% { opacity: 1; } }
+
+/* Speed Lines (Concentration) */
+#speedLines {
+  position: absolute; inset: -50%;
+  background: repeating-conic-gradient(from 0deg, transparent 0deg, transparent 2deg, rgba(255, 255, 255, 0.1) 2.5deg, transparent 3deg);
+  animation: rotateLines 0.1s infinite linear;
+}
+@keyframes rotateLines { from { transform: rotate(0deg); } to { transform: rotate(5deg); } }
+
+/* "NOW!" Signal */
+#signal {
+  position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center;
+}
+.signalText {
+  font-size: 120px; font-weight: 900; color: #fff;
+  text-shadow: 4px 4px 0 var(--neon-magenta), -4px -4px 0 var(--neon-cyan);
+  animation: popScale 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popScale { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* Slash Line */
+#slashLine {
+  position: absolute; width: 150%; height: 8px; background: #fff;
+  top: 55%; left: -25%; transform: rotate(-10deg) scaleX(0);
+  box-shadow: 0 0 20px #fff;
+  animation: slash 0.2s cubic-bezier(0, 1, 0, 1) forwards;
+}
+@keyframes slash { 0% { transform: rotate(-10deg) scaleX(0); } 100% { transform: rotate(-10deg) scaleX(1); } }
+
+/* --- CINEMATIC CUT-IN (Kirby Style) --- */
+#cutInLayer {
+  position: fixed; inset: 0; z-index: 200; pointer-events: none;
+}
+.cinematicBar {
+  position: absolute; left: 0; width: 100%; height: 50%; background: #000;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.top { top: 0; transform: translateY(-100%); }
+.bottom { bottom: 0; transform: translateY(100%); }
+
+#cutInLayer.active .top { transform: translateY(-15%); }
+#cutInLayer.active .bottom { transform: translateY(15%); }
+
+.facePanel {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 400px; height: 150px; display: flex; align-items: center;
+  opacity: 0; transition: 0.3s;
+}
+.facePanel img { height: 120px; width: auto; image-rendering: pixelated; margin: 0 20px; }
+.facePanel.left { left: -50px; justify-content: flex-start; background: linear-gradient(90deg, var(--neon-cyan), transparent); }
+.facePanel.right { right: -50px; justify-content: flex-end; background: linear-gradient(-90deg, var(--neon-magenta), transparent); }
+
+#cutInLayer.active .facePanel.left { opacity: 1; left: 0; transition-delay: 0.4s; }
+#cutInLayer.active .facePanel.right { opacity: 1; right: 0; transition-delay: 0.4s; }
+
+.cutInName { font-size: 40px; font-weight: 900; font-style: italic; text-shadow: 2px 2px #000; padding: 0 20px; }
+.versusText {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+  font-size: 80px; font-weight: 900; color: #fff;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#cutInLayer.active .versusText { transform: translate(-50%, -50%) scale(1); transition-delay: 0.6s; }
+
+/* --- SLICE EFFECT --- */
+#sliceContainer {
+  position: fixed; inset: 0; pointer-events: none; z-index: 150;
+}
+.slicePart {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  overflow: hidden; background: #000;
+}
+.slicePart.top {
+  clip-path: polygon(0 0, 100% 0, 100% 55%, 0 45%);
+  animation: slideTop 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+.slicePart.bottom {
+  clip-path: polygon(0 45%, 100% 55%, 100% 100%, 0 100%);
+  animation: slideBottom 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+@keyframes slideTop {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-10px, -5px); }
+  100% { transform: translate(-30px, -15px); opacity: 0; }
+}
+@keyframes slideBottom {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(10px, 5px); }
+  100% { transform: translate(30px, 15px); opacity: 0; }
+}
+
+/* --- RESULT (Game Over / Round End) --- */
+#resultLayer {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 100%; text-align: center; z-index: 200; pointer-events: none;
+  text-shadow: 0 4px 20px #000;
+  animation: dropIn 0.5s ease-out;
+}
+@keyframes dropIn { from { transform: translate(-50%, -100px); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+
+#winTitle { font-size: 20px; color: #888; letter-spacing: 5px; }
+#winName { font-size: 60px; font-weight: 900; color: var(--neon-yellow); margin: 10px 0; }
+#reactTime { font-size: 80px; font-weight: 900; font-family: "Impact", sans-serif; letter-spacing: 2px; margin: 10px 0; text-shadow: 4px 4px 0px #000; }
+#rankText { font-size: 24px; color: var(--neon-magenta); font-weight: bold; margin-top: 5px; }
+
+/* --- CHAMPION SCREEN --- */
+#championLayer {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.85);
+  display: flex; justify-content: center; align-items: center;
+  backdrop-filter: blur(10px);
+}
+.champContainer {
+  position: relative; text-align: center;
+  animation: popScale 0.5s ease-out;
+}
+.champTitle {
+  font-size: 40px; font-weight: 900; color: var(--neon-yellow);
+  text-shadow: 0 0 20px var(--neon-yellow); margin-bottom: 20px;
+}
+.champImg {
+  width: 150px; height: auto; image-rendering: pixelated;
+  filter: drop-shadow(0 0 20px var(--neon-cyan));
+  animation: float 2s infinite ease-in-out;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.champName {
+  font-size: 60px; font-weight: 900; margin-top: 20px;
+  background: linear-gradient(to right, var(--neon-cyan), #fff, var(--neon-magenta));
+  -webkit-background-clip: text; color: transparent;
+}
+.champSub {
+  margin-top: 20px; color: #aaa; font-size: 14px; animation: blink 1s infinite;
+}
+@keyframes blink { 50%{opacity:0.5} }
+
+/* Rotating Rings */
+.rotatingRing {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  border-radius: 50%; border: 2px dashed rgba(255,255,255,0.2);
+  pointer-events: none;
+}
+.outer {
+  width: 400px; height: 400px; border-color: var(--neon-magenta);
+  animation: spin 10s linear infinite;
+}
+.inner {
+  width: 300px; height: 300px; border-color: var(--neon-cyan);
+  animation: spin 6s linear infinite reverse;
+}
+@keyframes spin { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(360deg)} }
