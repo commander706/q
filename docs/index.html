@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>P2P Pong</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="dot"></div>
+        <div class="title">PONG GAME</div>
+        <div class="sub">P2P (PeerJS) / 招待URL / 7点先取</div>
+      </div>
+
+      <div class="net">
+        <div class="pill" id="netPill">接続準備中…</div>
+        <button class="btn ghost" id="copyInviteBtn" disabled>招待URLコピー</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card view" id="viewHome">
+        <h1>PONG GAME</h1>
+        <p class="muted">「部屋作成」か「探す」から開始。</p>
+        <div class="row">
+          <button class="btn" id="btnCreate">部屋作成</button>
+          <button class="btn" id="btnFind">探す</button>
+        </div>
+        <div class="hr"></div>
+        <details>
+          <summary>キー操作</summary>
+          <ul>
+            <li>左（ホスト）: W / S</li>
+            <li>右（ゲスト）: ↑ / ↓</li>
+          </ul>
+        </details>
+      </section>
+
+      <section class="card view hidden" id="viewCreate">
+        <h2>部屋作成</h2>
+        <div class="form">
+          <div class="field">
+            <label>公開/プライベート</label>
+            <div class="toggle">
+              <button class="seg active" id="segPrivate">プライベート</button>
+              <button class="seg" id="segPublic">公開</button>
+            </div>
+            <div class="muted small">
+              ※「公開ルーム一覧」は、PeerServerのdiscoveryが有効な場合のみ動くことがあります（クラウドは無効なことが多い）。
+            </div>
+          </div>
+
+          <div class="field" id="privateCodeField">
+            <label>部屋コード（好きに入力）</label>
+            <input id="createCode" class="input" maxlength="32" placeholder="例: myroom123" />
+            <div class="hint">英数字/ハイフン推奨。空白や日本語も一応OK（URLでは自動エンコード）。</div>
+          </div>
+
+          <div class="row">
+            <button class="btn ghost" id="btnBackFromCreate">戻る</button>
+            <button class="btn" id="btnDoCreate">作成</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card view hidden" id="viewFind">
+        <h2>探す</h2>
+        <div class="form">
+          <div class="field">
+            <label>部屋コードで参加</label>
+            <div class="row">
+              <input id="joinCode" class="input" maxlength="64" placeholder="例: myroom123" />
+              <button class="btn" id="btnJoinByCode">参加</button>
+            </div>
+            <div class="hint">相手が作成した「部屋コード」を入力。</div>
+          </div>
+
+          <div class="field">
+            <label>公開ルーム（可能なら）</label>
+            <div class="muted small" id="publicNote">読み込み中…（失敗したら「未対応」になります）</div>
+            <div class="list" id="publicList"></div>
+            <div class="hint">ここは PeerServer の peer discovery が有効なときだけ動く可能性があります。</div>
+          </div>
+
+          <div class="row">
+            <button class="btn ghost" id="btnBackFromFind">戻る</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card view hidden" id="viewLobby">
+        <h2>ルーム</h2>
+        <div class="grid2">
+          <div>
+            <div class="kv">
+              <div class="k">モード</div><div class="v" id="lobbyMode">-</div>
+              <div class="k">部屋コード</div><div class="v mono" id="lobbyCode">-</div>
+              <div class="k">役割</div><div class="v" id="lobbyRole">-</div>
+              <div class="k">人数</div><div class="v" id="lobbyCount">0/2</div>
+              <div class="k">状態</div><div class="v" id="lobbyState">待機中</div>
+            </div>
+            <div class="row">
+              <button class="btn" id="btnReady">準備OK</button>
+              <button class="btn ghost" id="btnLeave">退出</button>
+            </div>
+
+            <div class="hr"></div>
+            <div class="muted small">
+              2人が「準備OK」すると <b>3秒カウントダウン</b> のあと開始。
+            </div>
+          </div>
+
+          <div>
+            <h3>チャット（簡易）</h3>
+            <div class="chat" id="chatLog"></div>
+            <div class="row">
+              <input id="chatInput" class="input" placeholder="メッセージ…" />
+              <button class="btn" id="chatSend">送信</button>
+            </div>
+            <div class="muted small" id="latencyLine">RTT: - / 到達: -</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view hidden" id="viewGame">
+        <canvas id="gameCanvas"></canvas>
+        <div class="hud">
+          <div class="score"><span id="scoreL">0</span> : <span id="scoreR">0</span></div>
+          <div class="small muted" id="hudNote">W/S または ↑/↓</div>
+        </div>
+        <div class="centerOverlay hidden" id="centerOverlay">
+          <div class="big" id="centerText">3</div>
+          <div class="small muted" id="centerSub">開始まで</div>
+        </div>
+        <button class="btn ghost backInGame" id="btnExitGame">退出</button>
+      </section>
+    </main>
+
+    <footer class="footer muted small">
+      P2P Pong (PeerJS) / GitHub Pages /docs 用。繋がらない場合は回線やNATの都合でP2P直通できないことがあります。
+    </footer>
+  </div>
+
+  <script src="./main.js"></script>
+</body>
+</html>
