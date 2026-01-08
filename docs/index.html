@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEON SAMURAI</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- 背景（全画面） -->
+  <div id="bg"></div>
+
+  <!-- ゲーム画面（試合中のみ表示） -->
+  <div id="gameArea" class="hidden">
+    <div id="gameBg"></div> <!-- image.png用 -->
+    
+    <div class="charContainer" id="p1Container">
+      <div class="playerName" id="p1Name">Player 1</div>
+      <img src="./cmdsozai.png" class="charImg" id="p1Img" />
+    </div>
+
+    <div class="charContainer" id="p2Container">
+      <div class="playerName" id="p2Name">Player 2</div>
+      <img src="./cmdsozai.png" class="charImg" id="p2Img" />
+    </div>
+
+    <!-- 演出用レイヤー -->
+    <div id="effectLayer">
+      <div id="lightning" class="hidden"></div>
+      <div id="signal" class="hidden">今!!!</div>
+      <div id="slashLine" class="hidden"></div>
+      <div id="winMsg" class="hidden">WINNER</div>
+    </div>
+  </div>
+
+  <!-- HUD: ステータス表示 -->
+  <div id="hud">
+    <div class="pill" id="roomStatus">未接続</div>
+  </div>
+
+  <!-- メインパネル（ロビー・トーナメント表） -->
+  <div id="panel" class="panel">
+    <div class="panelTitle">NEON SAMURAI</div>
+    <div class="panelDesc">
+      反射神経バトル。音が鳴ったらキーを押せ。<br/>
+      操作: SPACE / Z / ENTER
+    </div>
+
+    <!-- 入力フォーム -->
+    <div id="loginForm">
+      <div class="row">
+        <div class="field">
+          <label>NAME</label>
+          <input id="nameInput" maxlength="16" placeholder="SamuraiName" />
+        </div>
+        <div class="field">
+          <label>ROOM CODE</label>
+          <input id="roomInput" maxlength="24" placeholder="room123" />
+        </div>
+      </div>
+      <div class="row buttons">
+        <button id="createBtn" class="primary">HOST GAME</button>
+        <button id="joinBtn">JOIN GAME</button>
+      </div>
+    </div>
+
+    <!-- ロビー画面 -->
+    <div id="lobbyArea" class="lobbyArea hidden">
+      <div class="divider"></div>
+      <div class="lobbyTop">
+        <div class="lobbyTitle">LOBBY</div>
+        <div class="lobbyMeta">
+          <span id="playersCount" class="badge">Players: 1</span>
+        </div>
+      </div>
+      <div id="playersList" class="playersList"></div>
+      
+      <div class="row lobbyButtons">
+        <button id="startTourneyBtn" class="primary hidden">START TOURNAMENT</button>
+      </div>
+      <div id="msg" class="msg"></div>
+    </div>
+
+    <!-- トーナメント表画面 -->
+    <div id="bracketArea" class="hidden">
+      <div class="divider"></div>
+      <div class="lobbyTitle">TOURNAMENT</div>
+      <div id="bracketList" class="bracketList"></div>
+      <div id="bracketStatus" class="bracketStatus">Waiting for match...</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>
