@@ -1,0 +1,218 @@
+:root {
+  --bg0: #050505;
+  --neon-blue: #0ff;
+  --neon-pink: #f0f;
+  --neon-red: #ff3333;
+  --neon-yellow: #ffdd33;
+  --panel-bg: rgba(10, 10, 15, 0.9);
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg0);
+  color: #fff;
+  font-family: "Courier New", monospace;
+  user-select: none;
+}
+
+/* UI Elements */
+.hidden { display: none !important; }
+
+#hud { position: fixed; left: 20px; top: 20px; z-index: 100; }
+.pill {
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--neon-blue);
+  box-shadow: 0 0 10px var(--neon-blue);
+  border-radius: 4px;
+  color: var(--neon-blue);
+  text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.panel {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, 90vw);
+  background: var(--panel-bg);
+  border: 2px solid var(--neon-pink);
+  box-shadow: 0 0 20px var(--neon-pink), inset 0 0 20px rgba(255, 0, 255, 0.2);
+  padding: 30px;
+  border-radius: 10px;
+  z-index: 50;
+  text-align: center;
+}
+
+.panelTitle {
+  font-size: 32px; font-weight: bold;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 15px var(--neon-yellow);
+  margin-bottom: 10px;
+}
+.panelDesc { font-size: 14px; color: #ccc; margin-bottom: 20px; line-height: 1.5; }
+
+.row { display: flex; gap: 15px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+.field { text-align: left; flex: 1; }
+label { display: block; font-size: 12px; color: var(--neon-blue); margin-bottom: 5px; }
+input {
+  width: 100%; padding: 10px;
+  background: #000; border: 1px solid #444;
+  color: #fff; outline: none;
+  font-family: inherit;
+}
+input:focus { border-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+
+button {
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+  text-shadow: 0 0 5px #fff;
+  box-shadow: 0 0 5px #fff;
+}
+button:hover { background: #fff; color: #000; }
+button.primary {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  box-shadow: 0 0 10px var(--neon-blue);
+  text-shadow: 0 0 8px var(--neon-blue);
+}
+button.primary:hover { background: var(--neon-blue); color: #000; }
+
+.divider { height: 2px; background: #333; margin: 20px 0; }
+.playersList { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.playerChip {
+  padding: 5px 10px; border: 1px solid #555;
+  background: #111; font-size: 12px;
+}
+
+/* Tournament Bracket Styles */
+.bracketList {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 20px; max-height: 300px; overflow-y: auto;
+}
+.matchRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px; border: 1px solid #444; background: #000;
+}
+.matchRow.active {
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 15px var(--neon-yellow);
+  animation: pulse 1s infinite alternate;
+}
+@keyframes pulse { from { box-shadow: 0 0 5px var(--neon-yellow); } to { box-shadow: 0 0 20px var(--neon-yellow); } }
+.vs { color: #888; font-size: 12px; margin: 0 10px; }
+.winnerName { color: var(--neon-yellow); font-weight: bold; }
+
+/* --- GAME AREA --- */
+#gameArea {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 10%; padding-bottom: 5%;
+}
+
+/* Background Image */
+#gameBg {
+  position: absolute; inset: 0; z-index: -1;
+  background: url('./image.png') no-repeat center center;
+  background-size: cover;
+  filter: brightness(0.6) contrast(1.2) hue-rotate(-10deg);
+}
+
+.charContainer {
+  position: relative; width: 300px; height: 300px;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 0.1s;
+}
+
+.playerName {
+  font-size: 20px; margin-bottom: 10px;
+  text-shadow: 2px 2px 0 #000;
+  background: rgba(0,0,0,0.5); padding: 2px 8px;
+}
+
+.charImg {
+  width: 100%; height: auto;
+  image-rendering: pixelated; /* ドット絵用 */
+}
+
+/* Player 1 (Left) - Flip to face right */
+#p1Container { align-items: flex-start; }
+#p1Img { transform: scaleX(-1); } 
+
+/* Player 2 (Right) - Default faces left */
+#p2Container { align-items: flex-end; }
+
+/* Effects */
+#effectLayer {
+  position: absolute; inset: 0; pointer-events: none;
+  display: flex; justify-content: center; align-items: center;
+}
+
+/* Lightning / Jagged Effect */
+#lightning {
+  position: absolute; inset: 0;
+  background: #fff;
+  clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+  opacity: 0;
+  animation: flashShock 0.3s linear;
+}
+@keyframes flashShock {
+  0% { opacity: 0; transform: scale(0.8); }
+  10% { opacity: 1; transform: scale(1.2); background: var(--neon-blue); }
+  20% { opacity: 0; }
+  30% { opacity: 1; transform: scale(1.1); background: #fff; }
+  100% { opacity: 0; }
+}
+
+/* "NOW!!!" Signal */
+#signal {
+  font-size: 150px; font-weight: 900; color: #fff;
+  text-shadow: 0 0 30px var(--neon-red), 4px 4px 0 #000;
+  background: rgba(255, 0, 0, 0.2);
+  padding: 20px 100px;
+  border: 5px solid var(--neon-red);
+  transform: rotate(-5deg);
+  animation: signalPop 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes signalPop { from { transform: scale(0) rotate(-15deg); } to { transform: scale(1) rotate(-5deg); } }
+
+/* Win/Lose Animations */
+.slashed {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+.exploded {
+  animation: explode 0.5s forwards;
+}
+@keyframes explode {
+  0% { transform: scale(1); filter: brightness(1) sepia(0); }
+  20% { transform: scale(1.2); filter: brightness(10) sepia(1) hue-rotate(-50deg); }
+  100% { transform: scale(2); opacity: 0; filter: blur(20px); }
+}
+
+#slashLine {
+  position: absolute; width: 120%; height: 5px;
+  background: #fff;
+  box-shadow: 0 0 20px #fff;
+  top: 50%; left: -10%;
+  transform: rotate(-15deg) scaleY(0);
+  animation: slashAnim 0.3s ease-out forwards;
+}
+@keyframes slashAnim {
+  0% { transform: rotate(-15deg) scaleY(0); opacity: 0; }
+  10% { transform: rotate(-15deg) scaleY(10); opacity: 1; }
+  100% { transform: rotate(-15deg) scaleY(0.1); opacity: 0; }
+}
+
+/* Moving winner */
+.winnerMoveLeft { animation: stepInLeft 0.3s forwards; }
+@keyframes stepInLeft { to { transform: translateX(100px) scaleX(-1); } }
+
+.winnerMoveRight { animation: stepInRight 0.3s forwards; }
+@keyframes stepInRight { to { transform: translateX(-100px); } }
