@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>3D Shooter (Solo / P2P Battle)</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <!-- Top HUD -->
+  <div id="hud" class="hud hidden">
+    <div class="hud-row">
+      <div class="hp">
+        <div class="hp-title">HP</div>
+        <div class="hp-bar"><div class="hp-fill" id="hpFill"></div></div>
+        <div class="hp-num" id="hpNum">100</div>
+      </div>
+      <div class="net">
+        <div class="net-title" id="netTitle">SOLO</div>
+        <div class="net-line">PING <span id="ping">—</span>ms</div>
+        <div class="net-line">ROOM <span id="roomId">—</span></div>
+      </div>
+    </div>
+
+    <div class="hud-row bottom">
+      <div class="weapon">
+        <div class="weapon-name" id="weaponName">PISTOL</div>
+        <div class="weapon-ammo"><span id="ammo">12</span>/<span id="reserve">48</span></div>
+        <div class="weapon-hint">切替: 1-4 / リロード: R</div>
+      </div>
+      <div class="hint" id="hint">クリックで照準ロック（FPS操作）</div>
+    </div>
+
+    <div class="crosshair" aria-hidden="true"></div>
+  </div>
+
+  <!-- Menu Overlay -->
+  <div id="overlay" class="overlay">
+    <div class="panel">
+      <div class="title">3D SHOOTER</div>
+      <div class="subtitle">HTML5 + Three.js / P2P Battle (PeerJS)</div>
+
+      <div class="btnrow">
+        <button id="soloBtn" class="btn primary">SOLO PLAY</button>
+        <button id="battleBtn" class="btn">BATTLE (P2P)</button>
+      </div>
+
+      <div id="battlePanel" class="battle hidden">
+        <div class="section">
+          <div class="sectionTitle">BATTLE LOBBY</div>
+          <div class="small">オーナーは「Create」を押して出てくるIDを相手に送ってください。</div>
+        </div>
+
+        <div class="grid2">
+          <div class="box">
+            <div class="boxTitle">Create (Owner)</div>
+            <button id="createBtn" class="btn primary">Create Room</button>
+            <div class="kv"><span>Your ID</span><code id="myId">—</code></div>
+            <button id="startBtn" class="btn hidden">Start Game</button>
+          </div>
+
+          <div class="box">
+            <div class="boxTitle">Join</div>
+            <label class="field">
+              <span>Owner ID</span>
+              <input id="joinId" placeholder="例) abcdefg" />
+            </label>
+            <button id="joinBtn" class="btn">Join Room</button>
+            <div class="kv"><span>Status</span><code id="status">—</code></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="small">
+            注意: PeerJS は “中央サーバーで相手IDを見つける” 仕組みが必要です。<br/>
+            このサンプルはデフォルト設定で動かします（環境によって繋がりにくい場合があります）。
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        操作: WASD移動 / Spaceジャンプ / Shiftダッシュ / 左クリック射撃
+      </div>
+    </div>
+  </div>
+
+  <!-- PeerJS (P2P) -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <!-- Seeded RNG -->
+  <script src="https://cdn.jsdelivr.net/npm/seedrandom@3.0.5/seedrandom.min.js"></script>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
